@@ -1,1 +1,2 @@
-# MERN_project
+# Foodi Website
+## Using MongoDB, Express, React and NodeJS
