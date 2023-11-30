@@ -6,9 +6,11 @@ import Footer from "../components/Footer";
 
 const Main = () => {
     return (
-        <div>
+        <div className="bg-gradient-to-r from-[#FAFAFA] from-0% to-[#FCFCFC] to-100%">
             <Navbar/>
-            <Outlet/>
+            <div className="min-h-screen min-w-screen">
+                <Outlet/>
+            </div>
             <Footer/>
         </div>
     )
