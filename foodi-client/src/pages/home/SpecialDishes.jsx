@@ -5,14 +5,14 @@ import Slider from "react-slick";
 import Cards from '../../components/Cards';
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa"
 
-const simpleNextArrow = (props) => {
+const SampleNextArrow = (props) => {
     const {className, style, onClick} = props;
     return (
         <div className={className} style={{...style, display: "block", background: "red"}} onClick={onClick}>NEXT</div>
     )
 }
 
-const simplePrevArrow = (props) => {
+const SamplePrevArrow = (props) => {
     const {className, style, onClick} = props;
     return (
         <div className={className} style={{...style, display: "block", background: "green"}} onClick={onClick}>BACK</div>
@@ -64,8 +64,8 @@ const SpecialDishes = () => {
                 }
             }
         ],
-        nextArrow: <simpleNextArrow/>,
-        prevArrow: <simplePrevArrow/>
+        nextArrow: <SampleNextArrow/>,
+        prevArrow: <SamplePrevArrow/>,
     }
     return (
         <div className='section-container section-bg-color py-20 text-black relative'>
