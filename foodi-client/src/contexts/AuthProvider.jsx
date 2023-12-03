@@ -31,11 +31,11 @@ const AuthProvider = ({children}) => {
     }
 
     // update profile
-    const updateUserProfile = ({name, photoURL}) => {
-        updateProfile(auth.currentUser, {
-            displayName: name, photoURL: photoURL
-        });
-    }
+    const updateUserProfile = (name, photoURL) => {
+        return  updateProfile(auth.currentUser, {
+              displayName: name, photoURL: photoURL
+            })
+      }
 
     // check signed-in user
     useEffect(()  => {
@@ -59,6 +59,7 @@ const AuthProvider = ({children}) => {
         login,
         logout,
         updateUserProfile,
+        loading,
     }
     return (
         <AuthContext.Provider value={authInfo}>

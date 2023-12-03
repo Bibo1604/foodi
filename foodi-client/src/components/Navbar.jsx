@@ -3,6 +3,7 @@ import logo from '/logo.png'
 import { FaRegUser } from "react-icons/fa";
 import Modal from './Modal';
 import { AuthContext } from '../contexts/AuthProvider';
+import Profile from './Profile';
 
 const Navbar = () => {
     const [isSticky, setIsSticky] = useState(false);
@@ -94,7 +95,11 @@ const Navbar = () => {
                     </div>
 
                     {/* loggin button */}
-                    <button className="btn bg-green rounded-full px-6 text-white flex items-center gap-2 border-none" onClick={()=>document.getElementById('my_modal_5').showModal()}><FaRegUser/> Login</button>
+                    {user ? 
+                        <Profile user={user}/>
+                    :
+                        <button className="btn bg-green rounded-full px-6 text-white flex items-center gap-2 border-none" onClick={()=>document.getElementById('my_modal_5').showModal()}><FaRegUser/> Login</button>
+                    }
                     <Modal/>
                 </div>
             </div>
