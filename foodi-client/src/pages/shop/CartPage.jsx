@@ -3,11 +3,18 @@ import useCart from '../../hooks/useCart'
 import { FaTrash } from 'react-icons/fa'
 import Swal from "sweetalert2"
 import { AuthContext } from '../../contexts/AuthProvider'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const CartPage = () => {
     const [cart, refetch] = useCart();
     const { user } = useContext(AuthContext);
     const [cartItems, setCartItems] = useState([]);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    if (!user) {
+        navigate('/', {state:{from: location}});
+    }
 
     // delete button
     const handleDelete = (item) => {
@@ -39,31 +46,26 @@ const CartPage = () => {
 
     // handle decrease function
     const handleDecrease = (item) => {
-        if (item.quantity > 1) {
-            fetch(`http://localhost:6001/carts/${item._id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                },
-                body: JSON.stringify({ quantity: item.quantity - 1 })
-            }).then(res => res.json()).then(data => {
-                const updatedCart = cartItems.map((cartItem) => {
-                    if (cartItem.id === item._id) {
-                        return {
-                            ...cartItem,
-                            quantity: cartItem.quantity - 1
-                        }
+        fetch(`http://localhost:6001/carts/${item._id}`, {
+            method: "PUT",
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            body: JSON.stringify({ quantity: item.quantity - 1 })
+        }).then(res => res.json()).then(data => {
+            const updatedCart = cartItems.map((cartItem) => {
+                if (cartItem.id === item._id) {
+                    return {
+                        ...cartItem,
+                        quantity: cartItem.quantity - 1
                     }
+                }
 
-                    return cartItem;
-                })
-                refetch();
-                setCartItems(updatedCart);
+                return cartItem;
             })
-        } else {
-            alert('Item cannot be zero!');
-        }
-
+            refetch();
+            setCartItems(updatedCart);
+        })
     }
 
     // handle increase function
@@ -96,91 +98,93 @@ const CartPage = () => {
     }
 
     // calculate total price
-    const cartSubTotal = cart.reduce((total, item) =>  {
+    const cartSubTotal = cart.reduce((total, item) => {
         return total + calculatePrice(item);
     }, 0)
 
     const orderTotal = cartSubTotal;
 
-    return (
-        <div className='section-container section-bg-color'>
-            {/* banner */}
-            <div className=''>
-                <div className='py-36 flex flex-col justify-center items-center gap-8'>
-                    {/* text */}
-                    <div className='space-y-7 px-4'>
-                        <h2 className='md:text-5xl text-4xl font-bold md:leading-snug leading-snug text-black'>Items Added to The <span className='text-green'>Cart</span></h2>
+    if (user) {
+        return (
+            <div className='section-container section-bg-color'>
+                {/* banner */}
+                <div className=''>
+                    <div className='py-36 flex flex-col justify-center items-center gap-8'>
+                        {/* text */}
+                        <div className='space-y-7 px-4'>
+                            <h2 className='md:text-5xl text-4xl font-bold md:leading-snug leading-snug text-black'>Items Added to The <span className='text-green'>Cart</span></h2>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* table for the cart */}
-            <div className=''>
-                <div className="overflow-x-auto">
-                    <table className="table">
-                        {/* head */}
-                        <thead className='bg-green text-white rounded-sm'>
-                            <tr>
-                                <th>#</th>
-                                <th>Food</th>
-                                <th>Item Name</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {/* row 1 */}
-                            {cart.map((item, index) => (
-                                <tr key={index} className='text-black'>
-                                    <td>{index + 1}</td>
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="avatar">
-                                                <div className="mask mask-squircle w-12 h-12">
-                                                    <img src={item.image} alt="" />
+                {/* table for the cart */}
+                <div className=''>
+                    <div className="overflow-x-auto">
+                        <table className="table">
+                            {/* head */}
+                            <thead className='bg-green text-white rounded-sm'>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Food</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {/* row 1 */}
+                                {cart.map((item, index) => (
+                                    <tr key={index} className='text-black'>
+                                        <td>{index + 1}</td>
+                                        <td>
+                                            <div className="flex items-center gap-3">
+                                                <div className="avatar">
+                                                    <div className="mask mask-squircle w-12 h-12">
+                                                        <img src={item.image} alt="" />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className='font-medium'>{item.name}</td>
-                                    <td>
-                                        <button className='btn btn-xs bg-slate-200 hover:bg-slate-300 text-black text-md border-none' onClick={() => handleDecrease(item)}>-</button>
-                                        <input type='number' value={item.quantity} onChange={() => console.log(item.quantity)} className='w-10 mx-2 text-center overflow-hidden appearance-none bg-white text-black' />
-                                        <button className='btn btn-xs bg-slate-200 hover:bg-slate-300 text-black text-md border-none' onClick={() => handleIncrease(item)}>+</button>
-                                    </td>
-                                    <td>${calculatePrice(item).toFixed(2)}</td>
-                                    <th>
-                                        <button className="btn btn-ghost text-red btn-xs text-lg" onClick={() => handleDelete(item)}>
-                                            <FaTrash />
-                                        </button>
-                                    </th>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        </td>
+                                        <td className='font-medium'>{item.name}</td>
+                                        <td>
+                                            <button className='btn btn-xs bg-slate-200 hover:bg-slate-300 text-black text-md border-none' onClick={() => handleDecrease(item)} disabled={item.quantity === 1}>-</button>
+                                            <input type='number' value={item.quantity} onChange={() => console.log(item.quantity)} className='w-10 mx-2 text-center overflow-hidden appearance-none bg-white text-black' />
+                                            <button className='btn btn-xs bg-slate-200 hover:bg-slate-300 text-black text-md border-none' onClick={() => handleIncrease(item)}>+</button>
+                                        </td>
+                                        <td>${calculatePrice(item).toFixed(2)}</td>
+                                        <th>
+                                            <button className="btn btn-ghost text-red btn-xs text-lg" onClick={() => handleDelete(item)}>
+                                                <FaTrash />
+                                            </button>
+                                        </th>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            {/* customer details */}
-            <div className='my-12 text-black flex flex-col md:flex-row justify-between items-start'>
-                <div className='md:w-1/2 space-y-3'>
-                    <h3 className='font-medium'>Cutomer Details</h3>
-                    <p>Name: {user.displayName}</p>
-                    <p>Email: {user.email}</p>
-                    <p>User ID: {user.uid}</p>
-                </div>
-                <div className='md:w-1/2 space-y-3'>
+                {/* customer details */}
+                <div className='my-12 text-black flex flex-col md:flex-row justify-between items-start'>
                     <div className='md:w-1/2 space-y-3'>
-                        <h3 className='font-medium'>Shopping Details</h3>
-                        <p>Total Items: {cart.length}</p>
-                        <p>Total Price: ${orderTotal.toFixed(2)}</p>
-                        <button className='btn bg-green text-white border-none'>Procceed to Checkout</button>
+                        <h3 className='font-medium'>Cutomer Details</h3>
+                        <p>Name: {user.displayName}</p>
+                        <p>Email: {user.email}</p>
+                        <p>User ID: {user.uid}</p>
+                    </div>
+                    <div className='md:w-1/2 space-y-3'>
+                        <div className='md:w-1/2 space-y-3'>
+                            <h3 className='font-medium'>Shopping Details</h3>
+                            <p>Total Items: {cart.length}</p>
+                            <p>Total Price: ${orderTotal.toFixed(2)}</p>
+                            <button className='btn bg-green text-white border-none'>Procceed to Checkout</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
 }
 
 export default CartPage

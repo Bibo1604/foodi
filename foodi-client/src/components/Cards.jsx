@@ -3,13 +3,15 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaHeart } from 'react-icons/fa'
 import { AuthContext } from '../contexts/AuthProvider';
 import Swal from 'sweetalert2'
+import useCart from '../hooks/useCart';
 
 const Cards = ({ item }) => {
     const [isHeartFilled, setIsHeartFilled] = useState(false);
     const { user } = useContext(AuthContext);
-    const { name, image, price, recipe, _id } = item;
+    const { name, image, price, _id } = item;
     const navigate = useNavigate();
     const location = useLocation();
+    const [cart, refetch] = useCart();
 
     const handleHeartClick = () => {
         setIsHeartFilled(!isHeartFilled);
@@ -26,6 +28,7 @@ const Cards = ({ item }) => {
                 },
                 body: JSON.stringify(cartItem)
             }).then(res => res.json()).then(data => {
+                refetch();
                 if (data.insertedId) {
                     Swal.fire({
                         position: "top-end",
