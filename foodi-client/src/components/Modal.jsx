@@ -1,17 +1,18 @@
 import React, { useContext, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import {FaGoogle, FaFacebook, FaGithub} from "react-icons/fa";
+import { FaGoogle, FaFacebook, FaGithub } from "react-icons/fa";
 import { useForm } from "react-hook-form"
 import { AuthContext } from '../contexts/AuthProvider';
+import axios from 'axios';
 
 const Modal = () => {
     const {
         register,
-        handleSubmit,
+        handleSubmit, reset,
         formState: { errors },
     } = useForm();
 
-    const {signupWithGmail, login} = useContext(AuthContext);
+    const { signupWithGmail, login } = useContext(AuthContext);
     const [errorMessage, setErrorMessage] = useState("");
 
     // redirect to home page or specific page
@@ -24,23 +25,37 @@ const Modal = () => {
         const password = data.password;
         login(email, password).then((result) => {
             const user = result.user;
-            alert("Login successful!");
-            document.getElementById('my_modal_5').close();
-            navigate(from, {replace: true});
+            const userInfo = {
+                name: data.name,
+                email: data.email,
+            };
+            axios.post("http://localhost:6001/users", userInfo).then((response) => {
+                alert("Login successful!");
+                document.getElementById('my_modal_5').close();
+                navigate(from, { replace: true });
+            });
         }).catch((error) => {
             const errorMessage = error.message;
-            setErrorMessage("Provide a correct email and password!");
-        })
+            console.log(errorMessage);
+            setErrorMessage("Please provide valid email & password!");
+        });
+        reset()
     };
 
-    // Google signin
+    // login with google
     const handleLogin = () => {
         signupWithGmail().then((result) => {
             const user = result.user;
-            alert("Login successful!");
-            document.getElementById('my_modal_5').close();
-            navigate(from, {replace: true});
-        }).carch((error) => console.log(error))
+            const userInfo = {
+                name: result?.user?.displayName,
+                email: result?.user?.email,
+            }
+            axios.post('http://localhost:6001/users', userInfo).then((response) => {
+                alert("Login successful!");
+                document.getElementById('my_modal_5').close();
+                navigate("/");
+            })
+        }).catch((error) => console.log(error));
     }
 
     return (
@@ -74,14 +89,14 @@ const Modal = () => {
 
                         {/* login button */}
                         <div className="form-control mt-4">
-                            <input type='submit' value='Login' className="btn bg-green text-white border-none"/>
+                            <input type='submit' value='Login' className="btn bg-green text-white border-none" />
                         </div>
 
                         <p className='text-center my-2'>Do not have an account?{" "}<Link to="/signup" className='underline text-red ml-1'>Signup Now</Link>{" "}</p>
 
-                        <button htmlFor="my_modal_5" onClick={()=>document.getElementById('my_modal_5').close()} className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        <button htmlFor="my_modal_5" onClick={() => document.getElementById('my_modal_5').close()} className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
-                    
+
                     {/* social sign in */}
                     <div className='text-center space-x-3 mb-5'>
                         <button className="btn btn-circle hover:bg-green hover:text-white border-none" onClick={handleLogin}>

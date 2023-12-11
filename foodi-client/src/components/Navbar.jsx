@@ -6,10 +6,11 @@ import { AuthContext } from '../contexts/AuthProvider';
 import Profile from './Profile';
 import { Link } from 'react-router-dom';
 import useCart from '../hooks/useCart';
+import useAuth from '../hooks/useAuth';
 
 const Navbar = () => {
     const [isSticky, setIsSticky] = useState(false);
-    const {user} = useContext(AuthContext);
+    const {user} = useAuth();
     // console.log(user);
     const [cart, refetch] = useCart();
     
