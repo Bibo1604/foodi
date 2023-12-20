@@ -19,7 +19,6 @@ const createUser = async (req, res) => {
         if (existingUser) {
             return res.status(302).json({ message: "User already exists!" });
         }
-
         const result = await User.create(user);
         res.status(200).json(result);
     } catch (error) {

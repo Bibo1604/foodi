@@ -48,8 +48,8 @@ const DashboardLayout = () => {
                                 <hr />
                                 <li className='mt-3'><Link to="/dashboard"><MdDashboard /> Dashboard</Link></li>
                                 <li><Link to="/dashboard"><FaShoppingBag /> Manage Bookings</Link></li>
-                                <li><Link to="/dashboard"><FaPlusCircle /> Add Menu</Link></li>
-                                <li><Link to="/dashboard"><FaEdit /> Manage Items</Link></li>
+                                <li><Link to="/dashboard/add-menu"><FaPlusCircle /> Add Menu</Link></li>
+                                <li><Link to="/dashboard/manage-items"><FaEdit /> Manage Items</Link></li>
                                 <li className='mb-3'><Link to="/dashboard/users"><FaUser /> All Users</Link></li>
 
                                 <hr />
