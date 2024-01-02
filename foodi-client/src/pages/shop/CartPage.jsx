@@ -165,7 +165,7 @@ const CartPage = () => {
                                             <td className="font-medium">{item.name}</td>
                                             <td>
                                                 <button className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black text-md border-none" onClick={() => handleDecrease(item)}>-</button>
-                                                <input type="number" value={item.quantity} onChange={() => console.log(item.quantity)} className="w-10 mx-2 text-center overflow-hidden appearance-none rance-none rance-none bg-white text-black"/>
+                                                <input type="number" value={item.quantity} onChange={() => console.log(item.quantity)} className="w-10 mx-2 text-center overflow-hidden appearance-none rance-none rance-none bg-white text-black" />
                                                 <button className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black text-md border-none" onClick={() => handleIncrease(item)}>+</button>
                                             </td>
                                             <td>${calculateTotalPrice(item).toFixed(2)}</td>
@@ -184,7 +184,7 @@ const CartPage = () => {
                             </table>
                         </div>
                     </div>
-                    <hr className="bg-black"/>
+                    <hr className="bg-black" />
                     <div className="flex flex-col md:flex-row justify-between items-start my-12 gap-8 text-black">
                         <div className="md:w-1/2 space-y-3">
                             <h3 className="text-lg font-semibold">Customer Details</h3>
@@ -201,9 +201,11 @@ const CartPage = () => {
                                 Total Price:{" "}
                                 <span id="total-price">${orderTotal.toFixed(2)}</span>
                             </p>
-                            <button className="btn btn-md bg-green text-white px-8 py-1 border-none">
-                                Procceed to Checkout
-                            </button>
+                            <Link to="/process-checkout">
+                                <button className="btn btn-md bg-green text-white px-8 py-1 border-none mt-5">
+                                    Procceed to Checkout
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
