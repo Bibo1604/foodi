@@ -39,4 +39,33 @@ router.get('/', verifyToken, async (req, res) => {
     }
 })
 
+// get all payments by users
+router.get('/all', async (req, res) => {
+    try {
+        const payments = await Payments.find({}).sort({createdAt: -1}).exec();
+        res.status(200).json(payments);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+})
+
+// confirm order status
+router.patch('/:id', async (req, res) => {
+    const paymentId = req.params.id;
+    const {status} = req.body;
+    try {
+        const updatedStatus = await Payments.findByIdAndUpdate(paymentId, {status: "confirmed"}, {
+            new: true,
+            runValidators: true
+        });
+
+        if (!updatedStatus) {
+            return res.status(404).json({message: "Order not found"});
+        }
+        res.status(200).json(updatedStatus);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+})
+
 module.exports = router;

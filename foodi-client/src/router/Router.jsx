@@ -15,6 +15,7 @@ import ManageItems from "../pages/dashboard/admin/ManageItems";
 import UpdateMenu from "../pages/dashboard/admin/UpdateMenu";
 import Payment from "../pages/shop/Payment";
 import Order from "../pages/dashboard/Order"
+import ManageBookings from "../pages/dashboard/admin/ManageBookings";
 
 const router = createBrowserRouter([
     {
@@ -80,6 +81,10 @@ const router = createBrowserRouter([
           element: <UpdateMenu/>,
           loader: ({params}) => fetch(`http://localhost:6001/menu/${params.id}`)
         },
+        {
+          path: 'manage-bookings',
+          element: <ManageBookings/>
+        }
       ]
     }
 ]);

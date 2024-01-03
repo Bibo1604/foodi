@@ -41,7 +41,7 @@ const Users = () => {
                         {/* head */}
                         <thead className='bg-green text-white rounded-lg'>
                             <tr>
-                                <th></th>
+                                <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Role</th>
