@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 // middleware
 app.use(cors());
 app.use(express.json());
@@ -29,10 +31,29 @@ app.post('/jwt', async (req, res) => {
 const menuRoutes = require('./api/routes/menuRoutes');
 const cartRoutes = require('./api/routes/cartRoutes');
 const userRoutes = require('./api/routes/userRoutes');
+const paymentRoutes = require('./api/routes/paymentRoutes');
 
 app.use('/menu', menuRoutes);
 app.use('/carts', cartRoutes);
 app.use('/users', userRoutes);
+app.use('/payments', paymentRoutes);
+
+// stipe payment route
+app.post("/create-payment-intent", async (req, res) => {
+    const { price } = req.body;
+    const amount = price * 100
+
+    // Create a PaymentIntent with the order amount and currency
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "cad",
+        payment_method_types: ["card"],
+    });
+
+    res.send({
+        clientSecret: paymentIntent.client_secret,
+    });
+});
 
 app.get('/', (req, res) => {
     res.send('Hello World!')

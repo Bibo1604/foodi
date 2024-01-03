@@ -1,12 +1,27 @@
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaPaypal } from 'react-icons/fa';
+import useAuth from '../../hooks/useAuth';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const CheckoutForm = ({ price, cart }) => {
     const stripe = useStripe();
     const elements = useElements();
+    const {user} = useAuth();
+    const axiosSecure = useAxiosSecure();
 
     const [cardError, setCardError] = useState("");
+    const [clientSecret, setClientSecret] = useState("");
+
+    useEffect(() =>  {
+        if (typeof(price) !== 'number' || price < 1) {
+            return;
+        }
+        axiosSecure.post('/create-payment-intent', {price}).then(res => {
+            console.log(res.data.clientSecret);
+            setClientSecret(res.data.clientSecret);
+        })
+    }, [price, axiosSecure])
 
     const handleSubmit = async (event) => {
         // Block native form submission.
@@ -38,7 +53,44 @@ const CheckoutForm = ({ price, cart }) => {
             setCardError(error.message);
         } else {
             setCardError("Success!");
-            console.log('[PaymentMethod]', paymentMethod);
+            // console.log('[PaymentMethod]', paymentMethod);
+        }
+
+        const { paymentIntent, error:confirmError } = await stripe.confirmCardPayment(
+            clientSecret,
+            {
+                payment_method: {
+                    card: card,
+                    billing_details: {
+                        name: user?.displayName || 'anonymous',
+                        email: user?.email || 'unknown'
+                    },
+                },
+            },
+        );
+
+        if (confirmError) {
+            console.log(confirmError);
+        }
+        console.log(paymentIntent);
+        if (paymentIntent.status === "succeeded") {
+            setCardError(`Your transaction ID is ${paymentIntent.id}`);
+
+            // payment info data
+            const paymentInfo = {
+                email: user.email,
+                transactionId: paymentIntent.id,
+                price,
+                quantity: cart.length,
+                status: "Order pending",
+                itemName: cart.map(item => item.name),
+                cartItems: cart.map(item => item._id),
+                menuItems: cart.map(item => item.menuItemId)
+            }
+
+            console.log(paymentInfo);
+            // send information to backend
+
         }
     };
 
@@ -78,14 +130,14 @@ const CheckoutForm = ({ price, cart }) => {
                         Pay
                     </button>
                 </form>
-                
-                {cardError ? <p className='text-red'>{cardError}</p> : ""}
+
+                {cardError ? <p className='text-red text-xs'>{cardError}</p> : ""}
 
                 {/* paypal option */}
                 <div className='mt-5 text-center'>
                     <hr />
                     <button type="submit" disabled={!stripe} className='btn btn-sm mt-5 bg-orange-500 text-white'>
-                        <FaPaypal/> Pay with Paypal
+                        <FaPaypal /> Pay with Paypal
                     </button>
                 </div>
             </div>
